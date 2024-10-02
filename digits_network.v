@@ -17,8 +17,8 @@ parameter p_deltaT1 = 'h7ff;
 parameter p_deltaT2 = 'h1ff;
 parameter p_eta1 = 8; 
 parameter p_eta2 = 8; 
-parameter p_default_thr1 = 'h2000;
-parameter p_default_thr2 = 'h2000;
+parameter p_default_thr1 = 'h08000;
+parameter p_default_thr2 = 'h08000;
 parameter p_default_w1 = 'hff;
 parameter p_default_w2 = 'hff;
 
@@ -27,7 +27,7 @@ parameter p_spike_delay = 10;
 parameter p_pattern_delay = 400;
 parameter p_sample_num = 10;
 parameter p_sample_len = 5;
-parameter p_epochs = 3000; 
+parameter p_epochs = 1000; 
   
 wire  [p_s1:1]  w_test_vector;
 wire            w_epochs;

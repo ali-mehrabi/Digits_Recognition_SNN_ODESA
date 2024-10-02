@@ -1,7 +1,7 @@
 
 module auto_trainer
 #(
-parameter  p_sample_num = 10,
+parameter  p_sample_num = 20,
 parameter  p_sample_len = 10,
 parameter  p_spike_delay = 200,
 parameter  p_pattern_delay = 200,
@@ -16,7 +16,7 @@ output [10:1]  o_label
 );
 
 
-parameter  p_test_len = 10;//p_sample_num * p_sample_len;
+parameter  p_test_len = 30;//p_sample_num * p_sample_len;
 
 
 reg                                r_end_of_epochs;
@@ -26,20 +26,37 @@ reg   [34:0]                       r_data;
 reg   [$clog2(p_pattern_delay):0]  r_counter;
 reg   [$clog2(p_epochs):0]         r_epochs;
 reg   [$clog2(p_spike_delay):0]    r_sp_counter;
-reg   [34:0]                       r_ram[0:9]; 
- 
-
+reg   [34:0]                       r_ram[0:p_test_len-1]; 
+integer file_handle;
 assign o_test_vector = r_data[34:10];
 assign o_label       = r_data[9:0];
 assign o_end_of_epochs = r_end_of_epochs;
 
 initial
 begin
-$readmemb("\digits1d.mem" ,r_ram); 
+r_end_of_epochs <= 0;
+$readmemb("\digits2.mem" ,r_ram); 
+#30000000;
+r_end_of_epochs <= 1;
+$readmemb("\digits2n.mem" ,r_ram); 
+end
+
+
+initial begin
+    file_handle = $fopen("\output2.txt", "w");  // Open the file in write mode
+    if (file_handle == 0) begin
+        $display("Error: Could not open file for writing.");
+        $finish;
+    end
+#10000000 $fclose(file_handle);
 end
 
 
 
+always @(r_epochs) begin
+    
+    $fwrite(file_handle, "0x%0X\n", digits_network.u_l1.u_l1_train.o_thresholds );  
+end
 
 always @(posedge ~i_clk or negedge i_rst_n) 
 begin 
@@ -50,7 +67,7 @@ if(!i_rst_n)
 	r_counter <= 0;
 	r_address <= 0;
 	r_epochs  <= 1;
-	r_end_of_epochs <= 0;
+	//r_end_of_epochs <= 0;
 	r_sp_counter <= 0;
   end
 else 
@@ -111,8 +128,8 @@ else
 			r_address <= 0;
 		    r_state <= 0;
 		  end
-		else
-	      r_end_of_epochs <=1;
+		//else
+	     // r_end_of_epochs <=1;
 	  end		  
    endcase
 end
